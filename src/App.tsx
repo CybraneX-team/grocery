@@ -16,6 +16,10 @@ import Tables from './pages/Tables';
 import Alerts from './pages/UiElements/Alerts';
 import Buttons from './pages/UiElements/Buttons';
 import DefaultLayout from './layout/DefaultLayout';
+import Products from './pages/Products';
+import Customers from './pages/Customers';
+import Details from './pages/Details';
+import CustomerDetails from './pages/CustomerDetail';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -61,6 +65,43 @@ function App() {
             </>
           }
         />
+        <Route
+          path="/products"
+          element={
+            <>
+              <PageTitle title="Products | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+              <Products />
+            </>
+          }
+        />
+        <Route
+          path="/customers"
+          element={
+            <>
+              <PageTitle title="Customers | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+              <Customers />
+            </>
+          }
+        />
+        <Route
+          path="/p-details/:id"
+          element={
+            <>
+              <PageTitle title="Customers | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+              <Details />
+            </>
+          }
+        />
+        <Route
+          path="/c-details/:id"
+          element={
+            <>
+              <PageTitle title="Customers | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+              <CustomerDetails />
+            </>
+          }
+        />
+
         <Route
           path="/forms/form-elements"
           element={

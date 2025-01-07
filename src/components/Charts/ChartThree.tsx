@@ -11,8 +11,8 @@ const options: ApexOptions = {
     fontFamily: 'Satoshi, sans-serif',
     type: 'donut',
   },
-  colors: ['#3C50E0', '#6577F3', '#8FD0EF', '#0FADCF'],
-  labels: ['Desktop', 'Tablet', 'Mobile', 'Unknown'],
+  colors: ['#3C50E0', '#80CAEE', '#8FD0EF', '#0FADCF', '#6577F3'],
+  labels: ['Electronics', 'Clothing', 'Food', 'Books', 'Sports'],
   legend: {
     show: false,
     position: 'bottom',

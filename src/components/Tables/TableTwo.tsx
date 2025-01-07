@@ -3,43 +3,57 @@ import ProductOne from '../../images/product/product-01.png';
 import ProductTwo from '../../images/product/product-02.png';
 import ProductThree from '../../images/product/product-03.png';
 import ProductFour from '../../images/product/product-04.png';
+import { useNavigate } from 'react-router-dom';
 
-const productData: Product[] = [
+export const productData: Product[] = [
   {
+    id: 1,
     image: ProductOne,
     name: 'Apple Watch Series 7',
     category: 'Electronics',
     price: 296,
     sold: 22,
     profit: 45,
+    btn: 'view more',
   },
   {
+    id: 2,
     image: ProductTwo,
     name: 'Macbook Pro M1',
     category: 'Electronics',
     price: 546,
     sold: 12,
     profit: 125,
+    btn: 'view more',
   },
   {
+    id: 3,
     image: ProductThree,
     name: 'Dell Inspiron 15',
     category: 'Electronics',
     price: 443,
     sold: 64,
     profit: 247,
+    btn: 'view more',
   },
   {
+    id: 4,
     image: ProductFour,
     name: 'HP Probook 450',
     category: 'Electronics',
     price: 499,
     sold: 72,
     profit: 103,
+    btn: 'view more',
   },
 ];
 
 const TableTwo = () => {
+  const navigate = useNavigate();
+
+  const handleViewMore = (id: number) => {
+    navigate(`/p-details/${id}`);
+  };
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
       <div className="py-6 px-4 md:px-6 xl:px-7.5">
@@ -69,7 +83,7 @@ const TableTwo = () => {
       {productData.map((product, key) => (
         <div
           className="grid grid-cols-6 border-t border-stroke py-4.5 px-4 dark:border-strokedark sm:grid-cols-8 md:px-6 2xl:px-7.5"
-          key={key}
+          key={product.id}
         >
           <div className="col-span-3 flex items-center">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -96,6 +110,14 @@ const TableTwo = () => {
           </div>
           <div className="col-span-1 flex items-center">
             <p className="text-sm text-meta-3">${product.profit}</p>
+          </div>
+          <div className="col-span-1 flex items-center">
+            <button
+              onClick={() => handleViewMore(product.id)}
+              className="text-sm text-meta-3"
+            >
+              {product.btn}
+            </button>
           </div>
         </div>
       ))}

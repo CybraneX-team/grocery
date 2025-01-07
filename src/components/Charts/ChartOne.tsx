@@ -1,6 +1,7 @@
 import { ApexOptions } from 'apexcharts';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactApexChart from 'react-apexcharts';
+import axios from 'axios';
 
 const options: ApexOptions = {
   legend: {
@@ -8,7 +9,7 @@ const options: ApexOptions = {
     position: 'top',
     horizontalAlign: 'left',
   },
-  colors: ['#3C50E0', '#80CAEE'],
+  colors: ['#3C50E0', '#FF5733', '#80CAEE'],
   chart: {
     fontFamily: 'Satoshi, sans-serif',
     height: 335,
@@ -45,7 +46,7 @@ const options: ApexOptions = {
     },
   ],
   stroke: {
-    width: [2, 2],
+    width: [2, 2, 2],
     curve: 'straight',
   },
   // labels: {
@@ -70,7 +71,7 @@ const options: ApexOptions = {
   markers: {
     size: 4,
     colors: '#fff',
-    strokeColors: ['#3056D3', '#80CAEE'],
+    strokeColors: ['#3C50E0', '#FF5733', '#80CAEE'],
     strokeWidth: 3,
     strokeOpacity: 0.9,
     strokeDashArray: 0,
@@ -83,20 +84,7 @@ const options: ApexOptions = {
   },
   xaxis: {
     type: 'category',
-    categories: [
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-    ],
+    categories: [],
     axisBorder: {
       show: false,
     },
@@ -121,40 +109,130 @@ interface ChartOneState {
     data: number[];
   }[];
 }
+type ChartData = {
+  totalSales: number[];
+  totalTaxAmount: number[];
+  totalTaxableAmount: number[];
+  months: string[];
+};
 
 const ChartOne: React.FC = () => {
+  const [chartData, setChartData] = useState<ChartData>({
+    totalSales: [],
+    totalTaxAmount: [],
+    totalTaxableAmount: [],
+    months: [],
+  });
   const [state, setState] = useState<ChartOneState>({
     series: [
       {
-        name: 'Product One',
-        data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30, 45],
+        name: 'Total Sales',
+        data: [],
       },
-
       {
-        name: 'Product Two',
-        data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39, 51],
+        name: 'Tax Amount',
+        data: [],
+      },
+      {
+        name: 'Taxable Amount',
+        data: [],
       },
     ],
   });
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(
+        'http://127.0.0.1:5000/api/monthly-sales',
+      );
+      const data = response.data;
 
-  const handleReset = () => {
-    setState((prevState) => ({
-      ...prevState,
-    }));
+      const totalSales = data.map((item: any) => Math.floor(item.TotalSales));
+      const totalTaxAmount = data.map((item: any) =>
+        Math.floor(item.TotalTaxAmount),
+      );
+      const totalTaxableAmount = data.map((item: any) =>
+        Math.floor(item.TotalTaxableAmount),
+      );
+      const months = data.map((item: any) => item.YearMonth);
+
+      setChartData({
+        totalSales,
+        totalTaxAmount,
+        totalTaxableAmount,
+        months,
+      });
+
+      setState({
+        series: [
+          {
+            name: 'Total Sales',
+            data: totalSales,
+          },
+          {
+            name: 'Taxable Amount',
+            data: totalTaxableAmount,
+          },
+          {
+            name: 'Tax Amount',
+            data: totalTaxAmount,
+          },
+        ],
+      });
+    } catch (error) {
+      console.error('Error fetching chart data:', error);
+    }
   };
-  handleReset;
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  // const handleReset = () => {
+  //   setState((prevState) => ({
+  //     ...prevState,
+  //   }));
+  // };
+  // handleReset;
+  const updatedOptions = {
+    ...options,
+    xaxis: {
+      ...options.xaxis,
+      categories: chartData.months,
+    },
+    // Remove the yaxis max limit since your values are much larger
+    yaxis: {
+      ...options.yaxis,
+      min: 0,
+      max: undefined,
+    },
+  };
 
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white px-5 pt-7.5 pb-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-8">
-      <div className="flex flex-wrap items-start justify-between gap-3 sm:flex-nowrap">
+      <div className="flex flex-wrap items-start justify-between gap-2 sm:flex-nowrap">
         <div className="flex w-full flex-wrap gap-3 sm:gap-5">
           <div className="flex min-w-47.5">
             <span className="mt-1 mr-2 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-primary">
               <span className="block h-2.5 w-full max-w-2.5 rounded-full bg-primary"></span>
             </span>
             <div className="w-full">
-              <p className="font-semibold text-primary">Total Revenue</p>
-              <p className="text-sm font-medium">12.04.2022 - 12.05.2022</p>
+              <p className="font-semibold text-primary">Total Sales</p>
+            </div>
+          </div>
+          <div className="flex min-w-47.5">
+            <span
+              className="mt-1 mr-2 flex h-4 w-full max-w-4 items-center justify-center rounded-full border"
+              style={{ borderColor: '#FF5733' }}
+            >
+              <span
+                className="block h-2.5 w-full max-w-2.5 rounded-full"
+                style={{ backgroundColor: '#FF5733' }}
+              ></span>
+            </span>
+            <div className="w-full">
+              <p className="font-semibold" style={{ color: '#FF5733' }}>
+                Taxable Amount
+              </p>
             </div>
           </div>
           <div className="flex min-w-47.5">
@@ -162,22 +240,8 @@ const ChartOne: React.FC = () => {
               <span className="block h-2.5 w-full max-w-2.5 rounded-full bg-secondary"></span>
             </span>
             <div className="w-full">
-              <p className="font-semibold text-secondary">Total Sales</p>
-              <p className="text-sm font-medium">12.04.2022 - 12.05.2022</p>
+              <p className="font-semibold text-secondary"> Total Tax </p>
             </div>
-          </div>
-        </div>
-        <div className="flex w-full max-w-45 justify-end">
-          <div className="inline-flex items-center rounded-md bg-whiter p-1.5 dark:bg-meta-4">
-            <button className="rounded bg-white py-1 px-3 text-xs font-medium text-black shadow-card hover:bg-white hover:shadow-card dark:bg-boxdark dark:text-white dark:hover:bg-boxdark">
-              Day
-            </button>
-            <button className="rounded py-1 px-3 text-xs font-medium text-black hover:bg-white hover:shadow-card dark:text-white dark:hover:bg-boxdark">
-              Week
-            </button>
-            <button className="rounded py-1 px-3 text-xs font-medium text-black hover:bg-white hover:shadow-card dark:text-white dark:hover:bg-boxdark">
-              Month
-            </button>
           </div>
         </div>
       </div>
@@ -185,7 +249,7 @@ const ChartOne: React.FC = () => {
       <div>
         <div id="chartOne" className="-ml-5">
           <ReactApexChart
-            options={options}
+            options={updatedOptions}
             series={state.series}
             type="area"
             height={350}
