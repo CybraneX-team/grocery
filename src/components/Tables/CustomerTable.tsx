@@ -5,6 +5,8 @@ import UserThree from '../../images/user/user-03.png';
 import UserFour from '../../images/user/user-04.png';
 import UserFive from '../../images/user/user-05.png';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useState, useEffect } from 'react';
 
 export const customerData: BRAND[] = [
   {
@@ -58,13 +60,38 @@ export const customerData: BRAND[] = [
     btn: 'view more',
   },
 ];
-
+interface Customer {
+  Party: string;
+  AvgTotalAmt: number;
+  TotalRevenue: number;
+  MostPurchasedProduct: string;
+}
 const TableOne = () => {
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const handleView = (id: number) => {
     navigate(`/c-details/${id}`);
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          'http://127.0.0.1:5000/api/customer-metrics',
+        );
+        const top10 = response.data
+          .sort((a: any, b: any) => b.TotalRevenue - a.TotalRevenue)
+          .slice(0, 10);
+        setCustomers(top10);
+      } catch (error) {
+        console.log('Error while fetching the data');
+      }
+    };
+    fetchData();
+  }, []);
   return (
     <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
       <h4 className="mb-6 text-xl font-semibold text-black dark:text-white">
@@ -100,46 +127,49 @@ const TableOne = () => {
           </div>
         </div>
 
-        {customerData.map((customer, key) => (
+        {customers.map((customer, key) => (
           <div
             className={`grid grid-cols-3 sm:grid-cols-5 ${
               key === customerData.length - 1
                 ? ''
                 : 'border-b border-stroke dark:border-strokedark'
             }`}
-            key={customer.id}
+            key={key}
           >
             <div className="flex items-center gap-3 p-2.5 xl:p-5">
               <div className="flex-shrink-0">
-                <img src={customer.logo} alt="customer" className="size-15" />
+                <img src="" alt="customer" className="size-15" />
               </div>
-              <p className="hidden text-black dark:text-white sm:block">
-                {customer.name}
+              <p className="hidden text-black dark:text-white sm:block max-w-2xl w-full">
+                {customer.Party.charAt(0).toUpperCase() +
+                  customer.Party.slice(1)}
               </p>
             </div>
 
             <div className="flex items-center justify-center p-2.5 xl:p-5">
-              <p className="text-black dark:text-white">{customer.visitors}K</p>
+              <p className="text-black dark:text-white">{}K</p>
             </div>
 
             <div className="flex items-center justify-center p-2.5 xl:p-5">
-              <p className="text-meta-3">${customer.revenues}</p>
+              <p className="text-meta-3">${customer.TotalRevenue}</p>
             </div>
 
             <div className="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
-              <p className="text-black dark:text-white">{customer.sales}</p>
+              <p className="text-black dark:text-white">
+                {customer.AvgTotalAmt}
+              </p>
             </div>
 
             <div className="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
-              <p className="text-meta-5">{customer.conversion}%</p>
+              <p className="text-meta-5">%</p>
             </div>
 
             <div className="col-span-1 flex items-center">
               <button
-                onClick={() => handleView(customer.id)}
+                // onClick={() => handleView("")}
                 className="text-sm text-meta-3"
               >
-                {customer.btn}
+                view more
               </button>
             </div>
           </div>

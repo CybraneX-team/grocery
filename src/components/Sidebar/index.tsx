@@ -64,8 +64,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     >
       {/* <!-- SIDEBAR HEADER --> */}
       <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
-        <NavLink to="/">
-          <img src={Logo} alt="Logo" />
+        <NavLink to="/" className="flex items-center gap-2">
+          <img src="/favicon.ico" alt="" className="w-8" />
+          <h2 className="text-3xl text-[#9c9c9c] mx-3">Sales</h2>
+          {/* <img src={Logo} alt="Logo" /> */}
         </NavLink>
 
         <button

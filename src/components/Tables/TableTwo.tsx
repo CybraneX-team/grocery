@@ -4,6 +4,8 @@ import ProductTwo from '../../images/product/product-02.png';
 import ProductThree from '../../images/product/product-03.png';
 import ProductFour from '../../images/product/product-04.png';
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 export const productData: Product[] = [
   {
@@ -48,14 +50,32 @@ export const productData: Product[] = [
   },
 ];
 
+interface Products {
+  Item: string;
+  AvgPricePerUnit: number;
+  HighestBuyingCustomer: string;
+  TotalQty: number;
+}
+
 const TableTwo = () => {
   const navigate = useNavigate();
+  const [products, setProducts] = useState<Products[]>([]);
 
   const handleViewMore = (id: number) => {
     navigate(`/p-details/${id}`);
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await axios.get(
+        'http://127.0.0.1:5000/api/product-metrics',
+      );
+      setProducts(response.data);
+    };
+    fetchData();
+  }, []);
   return (
-    <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+    <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark h-[38rem] overflow-hidden">
       <div className="py-6 px-4 md:px-6 xl:px-7.5">
         <h4 className="text-xl font-semibold text-black dark:text-white">
           Top Products
@@ -67,60 +87,65 @@ const TableTwo = () => {
           <p className="font-medium">Product Name</p>
         </div>
         <div className="col-span-2 hidden items-center sm:flex">
-          <p className="font-medium">Category</p>
-        </div>
-        <div className="col-span-1 flex items-center">
-          <p className="font-medium">Price</p>
-        </div>
-        <div className="col-span-1 flex items-center">
-          <p className="font-medium">Sold</p>
+          <p className="font-medium">Highest Buying Customer</p>
         </div>
         <div className="col-span-1 flex items-center">
           <p className="font-medium">Profit</p>
         </div>
+        <div className="col-span-1 flex items-center">
+          <p className="font-medium">Quantity</p>
+        </div>
+        <div className="col-span-1 flex items-center">
+          <p className="font-medium">Price</p>
+        </div>
       </div>
 
-      {productData.map((product, key) => (
-        <div
-          className="grid grid-cols-6 border-t border-stroke py-4.5 px-4 dark:border-strokedark sm:grid-cols-8 md:px-6 2xl:px-7.5"
-          key={product.id}
-        >
-          <div className="col-span-3 flex items-center">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-              <div className="h-12.5 w-15 rounded-md">
-                <img src={product.image} alt="Product" />
+      <div className="overflow-y-scroll h-full">
+        {products.map((product, key) => (
+          <div
+            className="grid grid-cols-6 border-t border-stroke py-4.5 px-4 dark:border-strokedark sm:grid-cols-8 md:px-6 2xl:px-7.5"
+            key={key}
+          >
+            <div className="col-span-3 flex items-center">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                <div className="h-12.5 w-15 rounded-md">
+                  <img src="" alt="Product" />
+                </div>
+                <p className="text-sm text-black dark:text-white">
+                  {product.Item}
+                </p>
               </div>
+            </div>
+            <div className="col-span-2 hidden items-center sm:flex">
               <p className="text-sm text-black dark:text-white">
-                {product.name}
+                {product.HighestBuyingCustomer}
               </p>
             </div>
+            <div className="col-span-1 flex items-center">
+              <p className="text-sm text-meta-3">$58</p>
+            </div>
+            <div className="col-span-1 flex items-center">
+              <p className="text-sm text-black dark:text-white">
+                {product.TotalQty}
+              </p>
+            </div>
+            <div className="col-span-1 flex items-center">
+              {/* <p className="text-sm text-meta-3">$58</p> */}
+              <p className="text-sm text-black dark:text-white">
+                ${product.AvgPricePerUnit}
+              </p>
+            </div>
+            <div className="col-span-1 flex items-center">
+              <button
+                // onClick={() => handleViewMore(product.id)}
+                className="text-sm text-meta-3"
+              >
+                view more
+              </button>
+            </div>
           </div>
-          <div className="col-span-2 hidden items-center sm:flex">
-            <p className="text-sm text-black dark:text-white">
-              {product.category}
-            </p>
-          </div>
-          <div className="col-span-1 flex items-center">
-            <p className="text-sm text-black dark:text-white">
-              ${product.price}
-            </p>
-          </div>
-          <div className="col-span-1 flex items-center">
-            <p className="text-sm text-black dark:text-white">{product.sold}</p>
-          </div>
-          <div className="col-span-1 flex items-center">
-            <p className="text-sm text-meta-3">${product.profit}</p>
-          </div>
-          <div className="col-span-1 flex items-center">
-            <button
-              onClick={() => handleViewMore(product.id)}
-              className="text-sm text-meta-3"
-            >
-              {product.btn}
-            </button>
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };
